@@ -14,29 +14,25 @@ function generateSchedule(int $year, int $month, int $numMonths = 1): void {
         
         for ($day = 1; $day <= $daysInMonth; $day++) {
             $date = new DateTime($currentDate->format('Y-m-') . $day);
-            $dayOfWeek = $date->format('N');
+            $dayOfWeek = (int)$date->format('N');
             $isWorkDay = false;
 
-            switch(true) {
-                case $workDay:
-                    if ($dayOfWeek >= 6) {
-                        while ($dayOfWeek >= 6) {
-                            $day++;
-                            $date->modify('+1 day');
-                            $dayOfWeek = (int)$date->format('N');
-                        }
-                    }
-    
+            // Weekend check
+            if ($dayOfWeek >= 6) {
+                $isWorkDay = false;
+                $daysOff++;
+            } else {
+                if ($workDay && $daysOff >= 2) {
                     $isWorkDay = true;
                     $workDay = false;
                     $daysOff = 0;
-                case !$workDay:
+                } else {
+                    $isWorkDay = false;
                     $daysOff++;
-                default:
                     if ($daysOff >= 2) {
                         $workDay = true;
                     }
-                    break;
+                }
             }
 
             $printDay = $isWorkDay ? "\033[32m$day\033[0m \n" : "\033[31m$day\033[0m \n";
